@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  open-api
+
+  Sample SAM Template for open-api
+
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+  FuncName:
+    Type: String
+    Default: helloworld
+
+Resources:
+  OpenApiRestAPI:
+    Type: AWS::Serverless::Api 
+    Properties:
+      StageName: !Ref Env
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: openapi-rest
+        paths:
+          /openapi-rest:
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FuncName}/invocations
+                httpMethod: "POST"
+                type: "aws_proxy"
+
+  OpenApiHttpAPI:
+    Type: AWS::Serverless::HttpApi 
+    Properties:
+      StageName: !Ref Env
+      DefinitionBody:
+        openapi: "3.0.1"
+        info:
+          title: openapi-http
+        paths:
+          /openapi-http:
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FuncName}/invocations
+                httpMethod: "POST"
+                type: "aws_proxy"
+
+  OpenApiFiledRestAPI:
+    Type: AWS::Serverless::Api 
+    Properties:
+      StageName: !Ref Env
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: openapis/REST/open-api.yaml
+
+  OpenApiFiledHttpAPI:
+    Type: AWS::Serverless::HttpApi 
+    Properties:
+      StageName: !Ref Env
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: openapis/HTTP_API/open-api.yaml
+
+Outputs:
+  OpenApiRestAPI:
+    Description: "API Gateway endpoint URL for dev stage"
+    Value: !Sub "https://${OpenApiRestAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}/openapi-rest"
+  OpenApiHttpAPI:
+    Description: "API Gateway endpoint URL for dev stage"
+    Value: !Sub "https://${OpenApiHttpAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}/openapi-http"
+  OpenApiFiledRestAPI:
+    Description: "API Gateway endpoint URL for dev stage"
+    Value: !Sub "https://${OpenApiFiledRestAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}/openapi-filed-rest"
+  OpenApiFiledHttpAPI:
+    Description: "API Gateway endpoint URL for dev stage"
+    Value: !Sub "https://${OpenApiFiledHttpAPI}.execute-api.${AWS::Region}.amazonaws.com/${Env}/openapi-filed-http"
+ 

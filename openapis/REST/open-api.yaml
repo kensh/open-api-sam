@@ -1,0 +1,11 @@
+openapi: "3.0.1"
+info:
+  title: openapi-filed-rest
+paths:
+  /openapi-filed-rest:
+    get:
+      x-amazon-apigateway-integration:
+        uri: 
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FuncName}/invocations
+        httpMethod: "POST"
+        type: "aws_proxy"
